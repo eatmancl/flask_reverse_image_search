@@ -17,7 +17,7 @@ def allowed_file(filename):
 
 @app.route("/") 
 def home_view(): 
-        return "<h1>server is running</h1>"
+    return "<h1>server is running</h1>"
 
 
 @app.route('/upload')
