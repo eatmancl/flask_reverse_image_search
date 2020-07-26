@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify,render_template
 import matcher
 import os
-from flask_cors import CORS
+from flask_cors import CORS, cross_origin
 from werkzeug.utils import secure_filename
 import Pic_str as generator
 
@@ -15,7 +15,8 @@ ALLOWED_EXTENSIONS = set(['png','PNG', 'jpg', 'JPG'])
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
 
-@app.route("/") 
+@app.route("/")
+@cross_origin()
 def home_view(): 
     return "<h1>server is running</h1>"
 
@@ -56,4 +57,4 @@ def post():
 
 
 if __name__ == '__main__':
-    app.run(port=33507)
+    app.run()
