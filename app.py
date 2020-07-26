@@ -52,8 +52,8 @@ def upload_show():
 @app.route('/test', methods=['GET'])
 @cross_origin()
 def post():
-    return jsonify({'code': 200,'msg':'asdasdasd'})
+    return jsonify({'code': 200,'msg':'test'})
 
 
 if __name__ == '__main__':
-    app.run()
+    app.run(port=33507)
