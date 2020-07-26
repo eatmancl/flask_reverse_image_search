@@ -16,10 +16,12 @@ def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
 
 @app.route('/upload')
+@cross_origin()
 def upload_test():
     return render_template('up.html')
 
 @app.route('/api/show', methods=['POST'])
+@cross_origin()
 def upload_show():
     #1.upload image
     file_dir = os.path.join(basedir, app.config['UPLOAD_FOLDER'])
@@ -42,7 +44,8 @@ def upload_show():
     return matcher.run(new_filename,model,basedir)
 
 
-@app.route('/test', methods=['POST'])
+@app.route('/test', methods=['GET'])
+@cross_origin()
 def post():
     return jsonify({'code': 200,'msg':'asdasdasd'})
 
