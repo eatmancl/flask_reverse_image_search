@@ -15,6 +15,11 @@ ALLOWED_EXTENSIONS = set(['png','PNG', 'jpg', 'JPG'])
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
 
+@app.route("/") 
+def home_view(): 
+        return "<h1>server is running</h1>"
+
+
 @app.route('/upload')
 @cross_origin()
 def upload_test():
