@@ -8,6 +8,10 @@ import os
 import matplotlib.pyplot as plt
 from collections import OrderedDict
 import operator
+from sys import argv
+from base64 import b64encode
+from json import dumps
+import json
 
 # Feature extractor
 def extract_features(image_path, vector_size=32):
@@ -67,7 +71,7 @@ class Matcher(object):
         v = vector.reshape(1, -1)
         return scipy.spatial.distance.cdist(self.matrix, v, 'cosine').reshape(-1)
 
-    def match(self, image_path, topn=20):
+    def match(self, image_path, topn=13):
         features = extract_features(image_path)
         # print(features)
         img_distances = self.cos_cdist(features)
@@ -93,18 +97,18 @@ def sort_key(old_dict, reverse=True):
 
 
 def run(input,model,basedir):
-    # model location
     ma = Matcher(model)
-    print("input url: ", input)
-    names, match = ma.match(input, topn=20)
-    res = dict()
-    for i in range(19):
+    names, match = ma.match(input, topn=13)
+    res = []
+    for i in range(12):
         # we got cosine distance, less cosine distance between vectors
         # more they similar, thus we subtruct it from 1 to get match value
-        res[str(round((1 - match[i]),4))] =  basedir + names[i][37::]
-        # show_img(res[(1 - match[i])])
-    # res = sorted(res)
-    sorted_res = sort_key(res)
-    # sorted_res = dict(sorted(res.items(), key=operator.itemgetter(1), reverse=True))
-    return sorted_res
+        temp = dict()
+        temp["condifence"] = str(round((1 - match[i]),4))
+        temp['image'] = names[i][52::]
+        res.append(temp)
+    res = json.dumps(res)
+    print(res)
+
+    return res
 

@@ -4,6 +4,7 @@ import os
 from flask_cors import CORS, cross_origin
 from werkzeug.utils import secure_filename
 import Pic_str as generator
+import base64
 
 app = Flask(__name__,static_url_path='/static')
 CORS(app)
@@ -25,23 +26,24 @@ def home_view():
 @cross_origin()
 def upload_show():
     file_dir = os.path.join(basedir, app.config['UPLOAD_FOLDER'])
+    print(basedir)
     if not os.path.exists(file_dir):
         os.makedirs(file_dir)
     f = request.files['image']
     if f and allowed_file(f.filename):
         fname = secure_filename(f.filename)
-        print (fname)
+        # print (fname)
         ext = fname.rsplit('.', 1)[1]
         new_filename = generator.create_uuid() + '.' + ext
         new_filename = os.path.join(file_dir, new_filename)
         f.save(new_filename)
-        print('image has been uploaded successfully')
-        print(new_filename)
+        # print('image has been uploaded successfully')
+        # print(new_filename)
     else:
         return jsonify({"error": 1001, "msg": "fail"})
     images = "static/flower/"
     model = "static/features1.pck"
-    return matcher.run(new_filename,model,basedir)
+    return jsonify(matcher.run(new_filename,model,basedir))
 
 @app.route('/test', methods=['GET'])
 @cross_origin()
