@@ -4,10 +4,10 @@ import scipy
 import scipy.spatial
 from imageio import imread
 import pickle
-import random
 import os
 import matplotlib.pyplot as plt
-
+from collections import OrderedDict
+import operator
 
 # Feature extractor
 def extract_features(image_path, vector_size=32):
@@ -25,7 +25,6 @@ def extract_features(image_path, vector_size=32):
         # computing descriptors vector
         kps, dsc = alg.compute(image, kps)
         # Flatten all of them in one big vector - our feature vector
-        # print(dsc)
         dsc = dsc.flatten()
         # Making descriptor of same size
         # Descriptor vector size is 64
@@ -40,7 +39,7 @@ def extract_features(image_path, vector_size=32):
     return dsc
 
 
-def batch_extractor(images_path, pickled_db_path="C:\\Users\\Administrator\\Desktop\\flask1\\static\\features1.pck"):
+def batch_extractor(images_path, pickled_db_path="C:\\Users\\Administrator\\Desktop\\flask1\\static\\features2.pck"):
     files = [os.path.join(images_path, p) for p in sorted(os.listdir(images_path))]
     result = {}
     for f in files:
@@ -52,7 +51,7 @@ def batch_extractor(images_path, pickled_db_path="C:\\Users\\Administrator\\Desk
         pickle.dump(result, fp)
 
 class Matcher(object):
-    def __init__(self, pickled_db_path="C:\\Users\\Administrator\\Desktop\\flask1\\static\\features1.pck"):
+    def __init__(self, pickled_db_path="C:\\Users\\Administrator\\Desktop\\flask1\\static\\features2.pck"):
         with open(pickled_db_path,'rb') as fp:
             self.data = pickle.load(fp)
         self.names = []
@@ -68,7 +67,7 @@ class Matcher(object):
         v = vector.reshape(1, -1)
         return scipy.spatial.distance.cdist(self.matrix, v, 'cosine').reshape(-1)
 
-    def match(self, image_path, topn=5):
+    def match(self, image_path, topn=20):
         features = extract_features(image_path)
         # print(features)
         img_distances = self.cos_cdist(features)
@@ -85,21 +84,27 @@ def show_img(path):
     plt.show()
 
 
+def sort_key(old_dict, reverse=True):
+    keys = sorted(old_dict.keys(),reverse=reverse)
+    new_dict = OrderedDict()
+    for key in keys:
+        new_dict[key] = old_dict[key]
+    return new_dict
+
+
 def run(input,model,basedir):
     # model location
     ma = Matcher(model)
-    # show_img(input)
     print("input url: ", input)
-    names, match = ma.match(input, topn=5)
+    names, match = ma.match(input, topn=20)
     res = dict()
-    # print('Result images ========================================')
-    for i in range(4):
+    for i in range(19):
         # we got cosine distance, less cosine distance between vectors
         # more they similar, thus we subtruct it from 1 to get match value
-        res[(1 - match[i])] =  basedir + names[i][37::]
-    return res
+        res[str(round((1 - match[i]),4))] =  basedir + names[i][37::]
+        # show_img(res[(1 - match[i])])
+    # res = sorted(res)
+    sorted_res = sort_key(res)
+    # sorted_res = dict(sorted(res.items(), key=operator.itemgetter(1), reverse=True))
+    return sorted_res
 
-images_path = 'C:\\Users\\Administrator\\Desktop\\flask1\\static\\flowers\\'
-sample = 'C:\\Users\\Administrator\\Desktop\\flask1\\static\\test\\123128873_546b8b7355_n.jpg'
-model='C:\\Users\\Administrator\\Desktop\\flask1\\static\\features1.pck'
-# run(sample,images_path,model)

@@ -20,16 +20,10 @@ def allowed_file(filename):
 def home_view(): 
     return "<h1>server is running</h1>"
 
-
-@app.route('/upload')
-@cross_origin()
-def upload_test():
-    return render_template('up.html')
-
+#upload and search
 @app.route('/api/show', methods=['POST'])
 @cross_origin()
 def upload_show():
-    #1.upload image
     file_dir = os.path.join(basedir, app.config['UPLOAD_FOLDER'])
     if not os.path.exists(file_dir):
         os.makedirs(file_dir)
@@ -49,12 +43,10 @@ def upload_show():
     model = "static/features1.pck"
     return matcher.run(new_filename,model,basedir)
 
-
 @app.route('/test', methods=['GET'])
 @cross_origin()
 def post():
     return jsonify({'code': 200,'msg':'test'})
-
 
 if __name__ == '__main__':
     app.run()
